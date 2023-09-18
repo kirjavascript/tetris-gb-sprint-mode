@@ -176,7 +176,7 @@ Boot::
 	nop                                                             ; $0100
 	jp   Begin                                                      ; $0101
 
-	
+
 SECTION "Header", ROM0[$134]
 
 	setcharmap main
@@ -218,25 +218,25 @@ Begin:
 
 
 UnusedGetScreenTileInHLWhileOamFree:
-	call GetScreen0AddressOfPieceSquare                             ; $0153
+	; call GetScreen0AddressOfPieceSquare                             ; $0153
 
-.waitUntilVramAndOamFree:
-	ldh  a, [rSTAT]                                                 ; $0156
-	and  STATF_LCD                                                  ; $0158
-	jr   nz, .waitUntilVramAndOamFree                               ; $015a
+; .waitUntilVramAndOamFree:
+	; ldh  a, [rSTAT]                                                 ; $0156
+	; and  STATF_LCD                                                  ; $0158
+	; jr   nz, .waitUntilVramAndOamFree                               ; $015a
 
-; get screen 0 tile in B
-	ld   b, [hl]                                                    ; $015c
+; ; get screen 0 tile in B
+	; ld   b, [hl]                                                    ; $015c
 
-.waitUntilVramAndOamFree2:
-	ldh  a, [rSTAT]                                                 ; $015d
-	and  STATF_LCD                                                  ; $015f
-	jr   nz, .waitUntilVramAndOamFree2                              ; $0161
+; .waitUntilVramAndOamFree2:
+	; ldh  a, [rSTAT]                                                 ; $015d
+	; and  STATF_LCD                                                  ; $015f
+	; jr   nz, .waitUntilVramAndOamFree2                              ; $0161
 
-; get the same tile in A, and check if still same as B
-	ld   a, [hl]                                                    ; $0163
-	and  b                                                          ; $0164
-	ret                                                             ; $0165
+; ; get the same tile in A, and check if still same as B
+	; ld   a, [hl]                                                    ; $0163
+	; and  b                                                          ; $0164
+	; ret                                                             ; $0165
 
 
 ; in: DE - a score value (category * count)
@@ -264,10 +264,10 @@ AddScoreValueDEontoBaseScoreHL:
 	ret  nc                                                         ; $0177
 
 ; if carry found in last byte, max score is 999,999
-	ld   a, $99                                                     ; $0178
-	ld   [hl-], a                                                   ; $017a
-	ld   [hl-], a                                                   ; $017b
-	ld   [hl], a                                                    ; $017c
+	; ld   a, $99                                                     ; $0178
+	; ld   [hl-], a                                                   ; $017a
+	; ld   [hl-], a                                                   ; $017b
+	; ld   [hl], a                                                    ; $017c
 	ret                                                             ; $017d
 
 
@@ -318,6 +318,35 @@ VBlankInterruptHandler:
 	call ProcessScoreUpdatesAfterBTypeLevelDone                     ; $01d2
 	call hOamDmaFunction                                            ; $01d5
 	call DisplayHighScoresAndNamesForLevel                          ; $01d8
+
+	ldh  a, [hGameState]
+    cp $4
+    jr nc, .noTimer
+
+
+    ; minutes
+    ld a, [timer2]
+    ld hl, _SCRN0 + $8d
+    ld [hl+], a
+
+    ; :
+    ld a, $24
+    ld [hl+], a
+
+    ; seconds
+    ld de, timer1
+    ld c, $1
+    call DisplayBCDNum2CDigits
+
+    ld a, $2F
+    ld [hl+], a
+
+    ; frames
+    ld de, timer0
+    ld hl, _SCRN0 + $92
+    ld c, $1
+    call DisplayBCDNum2CDigits
+.noTimer
 
 ; if just added drops to score..
 	ld   a, [wATypeJustAddedDropsToScore]                           ; $01db
@@ -637,7 +666,7 @@ ProcessGameState:
 	dw GameState34_PreRocketSceneWait
 	dw GameState35_CopyrightCanContinue
 	dw Stub_27ea
-	
+
 
 INCLUDE "code/introScreens.s"
 
@@ -756,11 +785,11 @@ DemoPollInput:
 
 
 UnusedClearDemoButtonsHeld:
-	xor  a                                                          ; $057d
-	ldh  [hDemoButtonsHeld], a                                      ; $057e
-	jr   DemoPollInput.clearButtonsPressedSetButtonsHeld            ; $0580
+	; xor  a                                                          ; $057d
+	; ldh  [hDemoButtonsHeld], a                                      ; $057e
+	; jr   DemoPollInput.clearButtonsPressedSetButtonsHeld            ; $0580
 
-	ret                                                             ; $0582
+	; ret                                                             ; $0582
 
 
 DemoRecordInput:
@@ -837,7 +866,7 @@ INCLUDE "code/multiplayer.s"
 INCLUDE "code/shuttleRocket.s"
 INCLUDE "code/menuScreens.s"
 
-	
+
 StoreAinHLwhenLCDFree:
 	ld   b, a                                                       ; $19fe
 
@@ -852,6 +881,13 @@ StoreBinHLwhenLCDFree:
 
 
 GameState0a_InGameInit:
+    ; clear timer
+    ld hl, timer0
+    ld a, $0
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl], a
+
 ; turn off lcd and clear some in-game vars
 	call TurnOffLCD                                                 ; $1a07
 	xor  a                                                          ; $1a0a
@@ -953,6 +989,7 @@ GameState0a_InGameInit:
 	xor  a                                                          ; $1a8e
 
 .setNumLinesCompleted:
+    ld a, $30 ; set a-type to 40 lines sprint
 	ldh  [hNumLinesCompletedBCD], a                                 ; $1a8f
 
 ; store low byte of num lines
@@ -1060,6 +1097,8 @@ SetNumFramesUntilPiecesMoveDown:
 .setTopSpeedForPieces:
 ; get num frames needed for a piece to move down from table idxed DE
 	ld   hl, .framesData                                            ; $1afa
+    ; ; always level 1
+	; ld   hl, $30
 	ld   d, $00                                                     ; $1afd
 	add  hl, de                                                     ; $1aff
 	ld   a, [hl]                                                    ; $1b00
@@ -1068,9 +1107,12 @@ SetNumFramesUntilPiecesMoveDown:
 	ret                                                             ; $1b05
 
 .framesData:
-	db $34, $30, $2c, $28, $24, $20, $1b, $15
-	db $10, $0a, $09, $08, $07, $06, $05, $05
-	db $04, $04, $03, $03, $02
+	db $30, $30, $30, $30, $30, $30, $30, $30
+	db $30, $30, $30, $30, $30, $30, $30, $30
+	db $30,$30,$30,$30,$30
+	; db $34, $30, $2c, $28, $24, $20, $1b, $15
+	; db $10, $0a, $09, $08, $07, $06, $05, $05
+	; db $04, $04, $03, $03, $02
 
 
 PopulateDemoBTypeScreenWithBlocks:
@@ -1237,6 +1279,40 @@ PopulateGameScreenWithRandomBlocks:
 
 
 GameState00_InGameMain:
+
+.incrementTimer
+    ld hl, timer0
+    ld a, [hl]
+
+    cp 60
+    jp c, .normal
+    ; second
+    ld a, $0
+    ld [hl+], a
+    ld a, [hl]
+
+    ; convert seconds to BCD
+    and $F
+    cp 9
+    jp c, .normal_seconds
+    ld a, [hl]
+    adc 6
+    ld [hl], a
+
+.normal_seconds
+    inc [hl]
+
+    ld a, [hl]
+    cp $60
+    jp c, .done
+    ; minute
+    ld a, $0
+    ld [hl+], a
+    ld a, [hl]
+.normal
+    inc [hl]
+.done
+
 ; ret if paused
 	call InGameCheckResetAndPause.start                             ; $1bce
 	ldh  a, [hGamePaused]                                           ; $1bd1
@@ -1244,9 +1320,9 @@ GameState00_InGameMain:
 	ret  nz                                                         ; $1bd4
 
 ; run demo funcs to manip pieces
-	call DemoSendPingsAndEndAfterAllStepsDone                       ; $1bd5
-	call DemoPollInput                                              ; $1bd8
-	call DemoRecordInput                                            ; $1bdb
+	; call DemoSendPingsAndEndAfterAllStepsDone                       ; $1bd5
+	; call DemoPollInput                                              ; $1bd8
+	; call DemoRecordInput                                            ; $1bdb
 
 ; regular main loop
 	call InGameCheckButtonsPressed                                  ; $1bde
@@ -1256,8 +1332,18 @@ GameState00_InGameMain:
 	call ShiftEntireGameRamBufferDownARow                           ; $1bea
 	call AddOnCompletedLinesScore                                   ; $1bed
 
+; check for sprint gameover
+    ld   a, [hNumLinesCompletedBCD]
+    cp $0
+    jp  nz, .notOver
+    ld   a, GS_GAME_OVER_INIT
+    ldh  [hGameState], a
+    ret
+
+.notOver
+
 ; restore buttons held eg to exit
-	call DemoRestorePlayerButtonsHeld                               ; $1bf0
+	; call DemoRestorePlayerButtonsHeld                               ; $1bf0
 	ret                                                             ; $1bf3
 
 
@@ -1471,8 +1557,8 @@ Display2PlayerPauseText:
 
 .text:
 	db "PAUSE"
-	
-	
+
+
 GameState01_GameOverInit:
 ; hide played and next piece, and send to oam
 	ld   a, SPRITE_SPEC_HIDDEN                                      ; $1ce2
@@ -1559,9 +1645,17 @@ GameState0d_GameOverScreenClearing:
 	ld   a, TILE_EMPTY                                              ; $1f37
 	call FillGameScreenBufferWithTileAandSetToVramTransfer          ; $1f39
 
+    ; show appropriate sprint message
+	ld   de, GameInnerScreenLayout_GameOver
+    ld   a, [hNumLinesCompletedBCD]
+    cp $0
+    jp  nz, .notOver
+	ld   de, GameInnerScreenLayout_GoodGame
+.notOver
+
+
 ; pipe box with game over text
 	ld   hl, wGameScreenBuffer+$43                                  ; $1f3c
-	ld   de, GameInnerScreenLayout_GameOver                         ; $1f3f
 	ld   c, $07                                                     ; $1f42
 	call CopyGameScreenInnerText                                    ; $1f44
 

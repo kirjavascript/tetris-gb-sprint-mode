@@ -1,65 +1,65 @@
 
 GameState24_CopyrightDisplay:
-	call TurnOffLCD                                                 ; $0369
+	; call TurnOffLCD                                                 ; $0369
 
-	call CopyAsciiAndTitleScreenTileData                            ; $036c
-	ld   de, Layout_Copyright                                       ; $036f
-	call CopyLayoutToScreen0                                        ; $0372
-	call Clear_wOam                                                 ; $0375
+	; call CopyAsciiAndTitleScreenTileData                            ; $036c
+	; ld   de, Layout_Copyright                                       ; $036f
+	; call CopyLayoutToScreen0                                        ; $0372
+	; call Clear_wOam                                                 ; $0375
 
-; set demo pieces
-	ld   hl, wDemoOrMultiplayerPieces                               ; $0378
-	ld   de, DemoPieces                                             ; $037b
+; ; set demo pieces
+	; ld   hl, wDemoOrMultiplayerPieces                               ; $0378
+	; ld   de, DemoPieces                                             ; $037b
 
-.copyLoop:
-	ld   a, [de]                                                    ; $037e
-	ld   [hl+], a                                                   ; $037f
-	inc  de                                                         ; $0380
-	ld   a, h                                                       ; $0381
-	cp   HIGH(wDemoOrMultiplayerPieces.end)                         ; $0382
-	jr   nz, .copyLoop                                              ; $0384
+; .copyLoop:
+	; ld   a, [de]                                                    ; $037e
+	; ld   [hl+], a                                                   ; $037f
+	; inc  de                                                         ; $0380
+	; ld   a, h                                                       ; $0381
+	; cp   HIGH(wDemoOrMultiplayerPieces.end)                         ; $0382
+	; jr   nz, .copyLoop                                              ; $0384
 
-; show all, with bg data at $8000, displayed at $9800
-	ld   a, LCDCF_ON|LCDCF_WIN9C00|LCDCF_BG8000|LCDCF_OBJON|LCDCF_BGON ; $0386
-	ldh  [rLCDC], a                                                 ; $0388
+; ; show all, with bg data at $8000, displayed at $9800
+	; ld   a, LCDCF_ON|LCDCF_WIN9C00|LCDCF_BG8000|LCDCF_OBJON|LCDCF_BGON ; $0386
+	; ldh  [rLCDC], a                                                 ; $0388
 
-; timer until title screen
-	ld   a, $fa                                                     ; $038a
-	ldh  [hTimer1], a                                               ; $038c
+; ; timer until title screen
+	; ld   a, $fa                                                     ; $038a
+	; ldh  [hTimer1], a                                               ; $038c
 
-; set next game state
-	ld   a, GS_COPYRIGHT_WAITING                                    ; $038e
-	ldh  [hGameState], a                                            ; $0390
-	ret                                                             ; $0392
+; ; set next game state
+	; ld   a, GS_COPYRIGHT_WAITING                                    ; $038e
+	; ldh  [hGameState], a                                            ; $0390
+	; ret                                                             ; $0392
 
 
 GameState25_CopyrightWaiting:
 ; wait for timer, set a new one, then go to next state
-	ldh  a, [hTimer1]                                               ; $0393
-	and  a                                                          ; $0395
-	ret  nz                                                         ; $0396
+	; ldh  a, [hTimer1]                                               ; $0393
+	; and  a                                                          ; $0395
+	; ret  nz                                                         ; $0396
 
-	ld   a, $fa                                                     ; $0397
-	ldh  [hTimer1], a                                               ; $0399
-	ld   a, GS_COPYRIGHT_CAN_CONTINUE                               ; $039b
-	ldh  [hGameState], a                                            ; $039d
-	ret                                                             ; $039f
+	; ld   a, $fa                                                     ; $0397
+	; ldh  [hTimer1], a                                               ; $0399
+	; ld   a, GS_COPYRIGHT_CAN_CONTINUE                               ; $039b
+	; ldh  [hGameState], a                                            ; $039d
+	; ret                                                             ; $039f
 
 
 GameState35_CopyrightCanContinue:
 ; go to next game state, when timer is done, or a button is pressed
-	ldh  a, [hButtonsPressed]                                       ; $03a0
-	and  a                                                          ; $03a2
-	jr   nz, .setNewState                                           ; $03a3
+	; ldh  a, [hButtonsPressed]                                       ; $03a0
+	; and  a                                                          ; $03a2
+	; jr   nz, .setNewState                                           ; $03a3
 
-	ldh  a, [hTimer1]                                               ; $03a5
-	and  a                                                          ; $03a7
-	ret  nz                                                         ; $03a8
+	; ldh  a, [hTimer1]                                               ; $03a5
+	; and  a                                                          ; $03a7
+	; ret  nz                                                         ; $03a8
 
-.setNewState:
-	ld   a, GS_TITLE_SCREEN_INIT                                    ; $03a9
-	ldh  [hGameState], a                                            ; $03ab
-	ret                                                             ; $03ad
+; .setNewState:
+	; ld   a, GS_TITLE_SCREEN_INIT                                    ; $03a9
+	; ldh  [hGameState], a                                            ; $03ab
+	; ret                                                             ; $03ad
 
 
 GameState06_TitleScreenInit:
@@ -146,114 +146,44 @@ GameState06_TitleScreenInit:
 	ret                                                             ; $041e
 
 
-PlayDemo:
-	ld   a, GAME_TYPE_A_TYPE                                        ; $041f
-	ldh  [hGameType], a                                             ; $0421
-
-; for demo 2, a type level 9
-	ld   a, $09                                                     ; $0423
-	ldh  [hATypeLevel], a                                           ; $0425
-
-; defaults for either demo
-	xor  a                                                          ; $0427
-	ldh  [hIs2Player], a                                            ; $0428
-	ldh  [hLowByteOfCurrDemoStepAddress], a                         ; $042a
-	ldh  [hDemoButtonsHeld], a                                      ; $042c
-	ldh  [hFramesUntilNextDemoInput], a                             ; $042e
-
-; demo 2 input address
-	ld   a, HIGH(Demo2Inputs)                                       ; $0430
-	ldh  [hAddressOfDemoInput], a                                   ; $0432
-	ld   a, LOW(Demo2Inputs)                                        ; $0434
-	ldh  [hAddressOfDemoInput+1], a                                 ; $0436
-
-; flip between demo 1 and 2
-	ldh  a, [hPrevOrCurrDemoPlayed]                                 ; $0438
-	cp   $02                                                        ; $043a
-	ld   a, $02                                                     ; $043c
-	jr   nz, .setDemoPlayed                                         ; $043e
-
-; for demo 1 - b type level 9, high 2
-	ld   a, GAME_TYPE_B_TYPE                                        ; $0440
-	ldh  [hGameType], a                                             ; $0442
-	ld   a, $09                                                     ; $0444
-	ldh  [hBTypeLevel], a                                           ; $0446
-	ld   a, $02                                                     ; $0448
-	ldh  [hBTypeHigh], a                                            ; $044a
-
-; demo 1 input address
-	ld   a, HIGH(Demo1Inputs)                                       ; $044c
-	ldh  [hAddressOfDemoInput], a                                   ; $044e
-	ld   a, LOW(Demo1Inputs)                                        ; $0450
-	ldh  [hAddressOfDemoInput+1], a                                 ; $0452
-
-; start from step $11 (after demo 2's steps)
-	ld   a, $11                                                     ; $0454
-	ldh  [hLowByteOfCurrDemoStepAddress], a                         ; $0456
-	ld   a, $01                                                     ; $0458
-
-.setDemoPlayed:
-	ldh  [hPrevOrCurrDemoPlayed], a                                 ; $045a
-
-; set game state
-	ld   a, GS_IN_GAME_INIT                                         ; $045c
-	ldh  [hGameState], a                                            ; $045e
-
-; load screen while lcd off
-	call TurnOffLCD                                                 ; $0460
-	call LoadAsciiAndMenuScreenGfx                                  ; $0463
-	ld   de, Layout_GameMusicTypeScreen                             ; $0466
-	call CopyLayoutToScreen0                                        ; $0469
-	call Clear_wOam                                                 ; $046c
-
-; turn on LCD
-	ld   a, LCDCF_ON|LCDCF_WIN9C00|LCDCF_BG8000|LCDCF_OBJON|LCDCF_BGON ; $046f
-	ldh  [rLCDC], a                                                 ; $0471
-	ret                                                             ; $0473
-
-
-UnusedSetRecordingDemo:
-	ld   a, $ff                                                     ; $0474
-	ldh  [hIsRecordingDemo], a                                      ; $0476
-	ret                                                             ; $0478
 
 
 GameState07_TitleScreenMain:
 ; timer multiplier * $7d until a demo plays
-	ldh  a, [hTimer1]                                               ; $0479
-	and  a                                                          ; $047b
-	jr   nz, .afterTimerCheck                                       ; $047c
+	; ldh  a, [hTimer1]                                               ; $0479
+	; and  a                                                          ; $047b
+	; jr   nz, .afterTimerCheck                                       ; $047c
 
-	ld   hl, hTimerMultiplier                                       ; $047e
-	dec  [hl]                                                       ; $0481
-	jr   z, PlayDemo                                                ; $0482
+	; ld   hl, hTimerMultiplier                                       ; $047e
+	; dec  [hl]                                                       ; $0481
+	; jr   z, PlayDemo                                                ; $0482
 
-	ld   a, $7d                                                     ; $0484
-	ldh  [hTimer1], a                                               ; $0486
+	; ld   a, $7d                                                     ; $0484
+	; ldh  [hTimer1], a                                               ; $0486
 
-.afterTimerCheck:
-; send $55 to indicate to a master GB that we're active
-	call SerialTransferWaitFunc                                     ; $0488
-	ld   a, SB_PASSIVES_PING_IN_TITLE_SCREEN                        ; $048b
-	ldh  [rSB], a                                                   ; $048d
-	ld   a, SC_REQUEST_TRANSFER|SC_PASSIVE                          ; $048f
-	ldh  [rSC], a                                                   ; $0491
+; .afterTimerCheck:
+; ; send $55 to indicate to a master GB that we're active
+	; call SerialTransferWaitFunc                                     ; $0488
+	; ld   a, SB_PASSIVES_PING_IN_TITLE_SCREEN                        ; $048b
+	; ldh  [rSB], a                                                   ; $048d
+	; ld   a, SC_REQUEST_TRANSFER|SC_PASSIVE                          ; $048f
+	; ldh  [rSC], a                                                   ; $0491
 
-; if a byte was processed..
-	ldh  a, [hSerialInterruptHandled]                               ; $0493
-	and  a                                                          ; $0495
-	jr   z, .checkButtonsPressed                                    ; $0496
+; ; if a byte was processed..
+	; ldh  a, [hSerialInterruptHandled]                               ; $0493
+	; and  a                                                          ; $0495
+	; jr   z, .checkButtonsPressed                                    ; $0496
 
-; and we've been assigned a role, go to multiplayer state
-; ie auto-start for passive GB
-	ldh  a, [hMultiplayerPlayerRole]                                ; $0498
-	and  a                                                          ; $049a
-	jr   nz, .setGameStateTo2ah                                     ; $049b
+; ; and we've been assigned a role, go to multiplayer state
+; ; ie auto-start for passive GB
+	; ldh  a, [hMultiplayerPlayerRole]                                ; $0498
+	; and  a                                                          ; $049a
+	; jr   nz, .setGameStateTo2ah                                     ; $049b
 
-; otherwise state is invalid
-	xor  a                                                          ; $049d
-	ldh  [hSerialInterruptHandled], a                               ; $049e
-	jr   .multiplayerInvalid                                        ; $04a0
+; ; otherwise state is invalid
+	; xor  a                                                          ; $049d
+	; ldh  [hSerialInterruptHandled], a                               ; $049e
+	; jr   .multiplayerInvalid                                        ; $04a0
 
 .checkButtonsPressed:
 ; buttons pressed in B, is 2 player in A

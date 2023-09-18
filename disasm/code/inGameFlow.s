@@ -377,26 +377,26 @@ InGameCheckIfAnyTetrisRowsComplete:
 
 ; process line count for game type
     ld   hl, hNumLinesCompletedBCD                               ; $2180
-    ldh  a, [hGameType]                                          ; $2183
-    cp   GAME_TYPE_B_TYPE                                        ; $2185
-    jr   z, .gameTypeB                                           ; $2187
+    ; ldh  a, [hGameType]                                          ; $2183
+    ; cp   GAME_TYPE_B_TYPE                                        ; $2185
+    ; jr   z, .gameTypeB                                           ; $2187
 
-; game type A, add to num lines word
-    ld   a, b                                                    ; $2189
-    add  [hl]                                                    ; $218a
-    daa                                                          ; $218b
-    ld   [hl+], a                                                ; $218c
-    ld   a, $00                                                  ; $218d
-    adc  [hl]                                                    ; $218f
-    daa                                                          ; $2190
-    ld   [hl], a                                                 ; $2191
-    jr   nc, .afterGameTypeNumLinesProcessing                    ; $2192
+; ; game type A, add to num lines word
+    ; ld   a, b                                                    ; $2189
+    ; add  [hl]                                                    ; $218a
+    ; daa                                                          ; $218b
+    ; ld   [hl+], a                                                ; $218c
+    ; ld   a, $00                                                  ; $218d
+    ; adc  [hl]                                                    ; $218f
+    ; daa                                                          ; $2190
+    ; ld   [hl], a                                                 ; $2191
+    ; jr   nc, .afterGameTypeNumLinesProcessing                    ; $2192
 
-; if carry out of high byte, score is 9999
-    ld   [hl], $99                                               ; $2194
-    dec  hl                                                      ; $2196
-    ld   [hl], $99                                               ; $2197
-    jr   .afterGameTypeNumLinesProcessing                        ; $2199
+; ; if carry out of high byte, score is 9999
+    ; ld   [hl], $99                                               ; $2194
+    ; dec  hl                                                      ; $2196
+    ; ld   [hl], $99                                               ; $2197
+    ; jr   .afterGameTypeNumLinesProcessing                        ; $2199
 
 .gameTypeB:
 ; get current lines - lines just completed, with min of 0
@@ -535,7 +535,7 @@ FlashCompletedTetrisRows:
 ; clear counter, set timer until shift
     xor  a                                                       ; $221f
     ldh  [hTetrisFlashCount], a                                  ; $2220
-    
+
     ld   a, $0d                                                  ; $2222
     ldh  [hTimer1], a                                            ; $2224
 
@@ -1003,7 +1003,7 @@ CopyRamBufferRow0ToVram:
     xor  a                                                       ; $2437
     ldh  [hCurrPlayersRowsShiftedUpDueToOtherPlayer], a          ; $2438
     ret                                                          ; $243a
-    
+
 
 DisplayGameATypeScoreIfInGameAndForced:
 ; ret if not in-game
@@ -1023,85 +1023,86 @@ DisplayGameATypeScoreIfInGameAndForced:
 
 ; eg for level 0, must do 10 lines. For level 1, must do 20 lines, etc
 CheckIfATypeNextLevelReached:
+    ret
 ; ret if not in-game
-    ldh  a, [hGameState]                                         ; $244b
-    and  a                                                       ; $244d
-    ret  nz                                                      ; $244e
+    ; ldh  a, [hGameState]                                         ; $244b
+    ; and  a                                                       ; $244d
+    ; ret  nz                                                      ; $244e
 
-; ret if not A-type
-    ldh  a, [hGameType]                                          ; $244f
-    cp   GAME_TYPE_A_TYPE                                        ; $2451
-    ret  nz                                                      ; $2453
+; ; ret if not A-type
+    ; ldh  a, [hGameType]                                          ; $244f
+    ; cp   GAME_TYPE_A_TYPE                                        ; $2451
+    ; ret  nz                                                      ; $2453
 
-; ret if == $14 (max value of level 20)
-    ld   hl, hATypeLinesThresholdToPassForNextLevel              ; $2454
-    ld   a, [hl]                                                 ; $2457
-    cp   $14                                                     ; $2458
-    ret  z                                                       ; $245a
+; ; ret if == $14 (max value of level 20)
+    ; ld   hl, hATypeLinesThresholdToPassForNextLevel              ; $2454
+    ; ld   a, [hl]                                                 ; $2457
+    ; cp   $14                                                     ; $2458
+    ; ret  z                                                       ; $245a
 
-; a and b is level
-    call ABisBCDofValInHL                                        ; $245b
+; ; a and b is level
+    ; call ABisBCDofValInHL                                        ; $245b
 
-; get num lines completed BCD+1, and ret if >= 1000
-    ldh  a, [hNumLinesCompletedBCD+1]                            ; $245e
-    ld   d, a                                                    ; $2460
-    and  $f0                                                     ; $2461
-    ret  nz                                                      ; $2463
+; ; get num lines completed BCD+1, and ret if >= 1000
+    ; ldh  a, [hNumLinesCompletedBCD+1]                            ; $245e
+    ; ld   d, a                                                    ; $2460
+    ; and  $f0                                                     ; $2461
+    ; ret  nz                                                      ; $2463
 
-; get num lines completed units digit, in tens spot in D
-    ld   a, d                                                    ; $2464
-    and  $0f                                                     ; $2465
-    swap a                                                       ; $2467
-    ld   d, a                                                    ; $2469
+; ; get num lines completed units digit, in tens spot in D
+    ; ld   a, d                                                    ; $2464
+    ; and  $0f                                                     ; $2465
+    ; swap a                                                       ; $2467
+    ; ld   d, a                                                    ; $2469
 
-; get num lines completed low byte's tens digit in units spot in D
-    ldh  a, [hNumLinesCompletedBCD]                              ; $246a
-    and  $f0                                                     ; $246c
-    swap a                                                       ; $246e
-    or   d                                                       ; $2470
+; ; get num lines completed low byte's tens digit in units spot in D
+    ; ldh  a, [hNumLinesCompletedBCD]                              ; $246a
+    ; and  $f0                                                     ; $246c
+    ; swap a                                                       ; $246e
+    ; or   d                                                       ; $2470
 
-; return if that value is now less than or equal to the lines threshold for level
-    cp   b                                                       ; $2471
-    ret  c                                                       ; $2472
+; ; return if that value is now less than or equal to the lines threshold for level
+    ; cp   b                                                       ; $2471
+    ; ret  c                                                       ; $2472
 
-    ret  z                                                       ; $2473
+    ; ret  z                                                       ; $2473
 
-; else inc that lines threshold, and put low digit in C
-    inc  [hl]                                                    ; $2474
-    call ABisBCDofValInHL                                        ; $2475
-    and  $0f                                                     ; $2478
-    ld   c, a                                                    ; $247a
+; ; else inc that lines threshold, and put low digit in C
+    ; inc  [hl]                                                    ; $2474
+    ; call ABisBCDofValInHL                                        ; $2475
+    ; and  $0f                                                     ; $2478
+    ; ld   c, a                                                    ; $247a
 
-; loop twice for units, then tens digit
-    ld   hl, _SCRN0+$f1                                          ; $247b
+; ; loop twice for units, then tens digit
+    ; ld   hl, _SCRN0+$f1                                          ; $247b
 
-.nextDigit:
-; lines threshold in vram for both screens
-    ld   [hl], c                                                 ; $247e
-    ld   h, HIGH(_SCRN1+$f1)                                     ; $247f
-    ld   [hl], c                                                 ; $2481
+; .nextDigit:
+; ; lines threshold in vram for both screens
+    ; ld   [hl], c                                                 ; $247e
+    ; ld   h, HIGH(_SCRN1+$f1)                                     ; $247f
+    ; ld   [hl], c                                                 ; $2481
 
-; get high digit in C
-    ld   a, b                                                    ; $2482
-    and  $f0                                                     ; $2483
-    jr   z, .afterSendingNewLevelToVram                          ; $2485
+; ; get high digit in C
+    ; ld   a, b                                                    ; $2482
+    ; and  $f0                                                     ; $2483
+    ; jr   z, .afterSendingNewLevelToVram                          ; $2485
 
-    swap a                                                       ; $2487
-    ld   c, a                                                    ; $2489
+    ; swap a                                                       ; $2487
+    ; ld   c, a                                                    ; $2489
 
-; end after next loop
-    ld   a, l                                                    ; $248a
-    cp   $f0                                                     ; $248b
-    jr   z, .afterSendingNewLevelToVram                          ; $248d
+; ; end after next loop
+    ; ld   a, l                                                    ; $248a
+    ; cp   $f0                                                     ; $248b
+    ; jr   z, .afterSendingNewLevelToVram                          ; $248d
 
-    ld   hl, _SCRN0+$f0                                          ; $248f
-    jr   .nextDigit                                              ; $2492
+    ; ld   hl, _SCRN0+$f0                                          ; $248f
+    ; jr   .nextDigit                                              ; $2492
 
-.afterSendingNewLevelToVram:
-    ld   a, SND_REACHED_NEXT_LEVEL                               ; $2494
-    ld   [wSquareSoundToPlay], a                                 ; $2496
-    call SetNumFramesUntilPiecesMoveDown                         ; $2499
-    ret                                                          ; $249c
+; .afterSendingNewLevelToVram:
+    ; ld   a, SND_REACHED_NEXT_LEVEL                               ; $2494
+    ; ld   [wSquareSoundToPlay], a                                 ; $2496
+    ; call SetNumFramesUntilPiecesMoveDown                         ; $2499
+    ; ret                                                          ; $249c
 
 
 ABisBCDofValInHL:
@@ -1418,4 +1419,3 @@ InGameAddPieceToVram:
     ld   hl, wSpriteSpecs                                        ; $25d3
     ld   [hl], SPRITE_SPEC_HIDDEN                                ; $25d6
     ret                                                          ; $25d8
-    

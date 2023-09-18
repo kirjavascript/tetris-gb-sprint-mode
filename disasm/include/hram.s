@@ -6,8 +6,9 @@ hButtonsHeld:: ; $ff80
 hButtonsPressed:: ; $ff81
     db
 
-hff82:
-    ds 5-2
+timer0:: db
+timer1:: db
+timer2:: db
 
 hVBlankInterruptFinished:: ; $ff85
     db

@@ -5,13 +5,14 @@ Gfx_MenuScreens:
 .end:
 
 Layout_ATypeInGame:
-	INCBIN "data/layout_aTypeInGame.bin"
+    ; 40 lines
+	INCBIN "data/layout_aTypeInGame_30.bin"
 
 STATIC_ASSERT $4000-@ == BANK_0_END_LEN
 Layout_BTypeInGame::
 	INCBIN "data/layout_bTypeInGame.bin", 0, $4000-@
 
-    
+
 SECTION "ROM Bank $001", ROMX[$4000], BANK[$1]
 
 	INCBIN "data/layout_bTypeInGame.bin", BANK_0_END_LEN
@@ -19,7 +20,7 @@ SECTION "ROM Bank $001", ROMX[$4000], BANK[$1]
 Gfx_Ascii::
 	INCBIN "build/ascii.1bpp"
 .end::
-	
+
 Gfx_TitleScreen::
 	INCBIN "build/titleScreen.2bpp"
 .end::
@@ -53,7 +54,7 @@ Layout_2PlayerInGame::
 
 Layout_MarioScore::
 	INCBIN "data/layout_marioScore.bin"
-	
+
 Layout_BricksAndLuigiScore::
 	INCBIN "data/layout_bricksAndLuigiScore.bin"
 

@@ -91,7 +91,7 @@ SpriteSpecStruct_LPieceNext:
 SpriteSpecStruct_GameMusicAType:
 	db $00, $70, $37, SPRITE_SPEC_A_TYPE, $00, $00
 	db $00, $38, $37, SPRITE_SPEC_A_TYPE, $00, $00
-	
+
 
 SpriteSpecStruct_ATypeFlashing0:
 	db $00, $40, $34, SPRITE_SPEC_IDX_0, $00, $00
@@ -146,14 +146,14 @@ SpriteSpecStruct_ShuttleAndGas:
 	db $00, $5f, $57, SPRITE_SPEC_SHUTTLE, $00, $00
 	db $80, $80, $50, SPRITE_SPEC_SMALL_LIFTOFF_GAS, $00, $00
 	db $80, $80, $60, SPRITE_SPEC_SMALL_LIFTOFF_GAS, $00, $20
-	
-	
+
+
 SpriteSpecStruct_RocketAndGas:
 	db $00, $6f, $57, SPRITE_SPEC_BIG_ROCKET, $00, $00
 	db $80, $80, $55, SPRITE_SPEC_SMALL_LIFTOFF_GAS, $00, $00
 	db $80, $80, $5b, SPRITE_SPEC_SMALL_LIFTOFF_GAS, $00, $20
-	
-	
+
+
 FillScreen0FromHLdownWithEmptyTile:
 	ld   hl, _SCRN0+$3ff                                            ; $2795
 
@@ -367,6 +367,15 @@ GameInnerScreen_TryAgain:
 	db " ...    "
 	db "  AGAIN<3"
 	db "  ..... "
+
+GameInnerScreenLayout_GoodGame:
+	db "'//======\\'"
+	db "'||      ||'"
+	db "'|| GOOD ||'"
+	db "'|| ____ ||'"
+	db "'|| GAME ||'"
+	db "'|| ____ ||'"
+	db ",\\~~~~~~,//"
 
 
 PollInput:
@@ -608,7 +617,7 @@ CopyToShadowOamBasedOnSpriteSpec:
 	ld   l, a                                                       ; $2a9c
 	ld   de, SPR_SPEC_SIZEOF                                        ; $2a9d
 	add  hl, de                                                     ; $2aa0
-	
+
 ; check if more sprite specs to process
 	ldh  a, [hNumSpriteSpecs]                                       ; $2aa1
 	dec  a                                                          ; $2aa3
@@ -823,4 +832,3 @@ CopyToShadowOamBasedOnSpriteSpec:
 
 	pop  hl                                                         ; $2b60
 	jp   .bigLoop                                                   ; $2b61
-	

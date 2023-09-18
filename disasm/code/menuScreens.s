@@ -46,8 +46,12 @@ GameMusicTypeInitWithoutDisablingSerialRegs:
     call PlaySongBasedOnMusicTypeChosen                          ; $1481
     ld   a, LCDCF_ON|LCDCF_WIN9C00|LCDCF_BG8000|LCDCF_OBJON|LCDCF_BGON ; $1484
     ldh  [rLCDC], a                                              ; $1486
-    ld   a, GS_GAME_TYPE_MAIN                                    ; $1488
+    ; ld   a, GS_GAME_TYPE_MAIN                                    ; $1488
+    ld   a, GS_A_TYPE_SELECTION_INIT                                   ; $1577
     ldh  [hGameState], a                                         ; $148a
+    ; turn music off?
+    ld   a, $3
+    ldh  [hMusicType], a
 
 Stub_148c:
     ret                                                          ; $148c
