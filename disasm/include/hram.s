@@ -113,7 +113,10 @@ hTempIE:: ; $ffa1
     db
 
 hffa2:
-    ds 4-2
+    ds 1
+
+timerTmp::
+    db
 
 hUnusedFFA4:: ; $ffa4
     db

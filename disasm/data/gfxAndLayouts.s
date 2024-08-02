@@ -6,7 +6,7 @@ Gfx_MenuScreens:
 
 Layout_ATypeInGame:
     ; 40 lines
-	INCBIN "data/layout_aTypeInGame_30.bin"
+	INCBIN "data/layout_aTypeInGame_40.bin"
 
 STATIC_ASSERT $4000-@ == BANK_0_END_LEN
 Layout_BTypeInGame::

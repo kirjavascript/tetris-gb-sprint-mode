@@ -270,6 +270,8 @@ AddScoreValueDEontoBaseScoreHL:
 	; ld   [hl], a                                                    ; $017c
 	ret                                                             ; $017d
 
+BCDLookup:
+    db $0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59
 
 VBlankInterruptHandler:
 ; preserve regs
@@ -342,7 +344,18 @@ VBlankInterruptHandler:
     ld [hl+], a
 
     ; frames
-    ld de, timer0
+    ; ld de, timer0
+
+    ld a, [timer0]        ; Load the value of timer0 into A register
+    ld hl, BCDLookup      ; Load the base address of BCDLookup into HL
+    ld b, 0
+    ld c, a               ; Move A into C to use it as an index
+    add hl, bc            ; Add the offset to the HL register (HL = HL + BC)
+    ld a, [hl]            ; Load the byte at HL (BCDLookup + timer0 index) into A
+    ld [timerTmp], a      ; Store the result into timerTmp
+
+    ld de, timerTmp
+
     ld hl, _SCRN0 + $92
     ld c, $1
     call DisplayBCDNum2CDigits
@@ -989,7 +1002,7 @@ GameState0a_InGameInit:
 	xor  a                                                          ; $1a8e
 
 .setNumLinesCompleted:
-    ld a, $30 ; set a-type to 40 lines sprint
+    ld a, $40 ; set a-type to 40 lines sprint
 	ldh  [hNumLinesCompletedBCD], a                                 ; $1a8f
 
 ; store low byte of num lines
@@ -1284,7 +1297,7 @@ GameState00_InGameMain:
     ld hl, timer0
     ld a, [hl]
 
-    cp 60
+    cp 59
     jp c, .normal
     ; second
     ld a, $0
